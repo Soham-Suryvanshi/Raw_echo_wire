@@ -3,6 +3,7 @@
 #include <netinet/in.h>
 #include <cstdlib>
 #include<unistd.h>
+#include<algorithm>
 
 
 int main(){
@@ -41,6 +42,36 @@ int main(){
     exit(EXIT_FAILURE);
    }
    std::cout<<"accepted client,fd="<<client_fd<<std::endl;
+
+   char buffer[1024] = {0};
+   ssize_t bytes_read = recv(client_fd,buffer,sizeof(buffer)-1,0);
+   if(bytes_read < 0){
+      perror("recv failed");
+      close(client_fd);
+      close(server_fd);
+      exit(EXIT_FAILURE);
+   }
+   if(bytes_read==0){
+      std::cout<<"client disconnected without sending data"<<std::endl;
+      close(client_fd);
+      close(server_fd);
+   }
+
+   std::cout<<"recieved "<<bytes_read<<" bytes: "<<buffer<<std::endl;
+
+   std::reverse(buffer , buffer + bytes_read);
+   ssize_t total_sent = 0;
+   while(total_sent < bytes_read){
+      ssize_t sent = send(client_fd , buffer + total_sent , bytes_read -total_sent , 0);
+      if(sent < 0){
+         perror("Send Failed");
+         close(client_fd);
+         close(server_fd);
+         exit(EXIT_FAILURE);
+      }
+      total_sent += sent;
+   }
+
    close(client_fd);
    close(server_fd);
    return 0;
