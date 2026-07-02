@@ -1,0 +1,1 @@
+A minimal single-client TCP server in C++ using the Linux socket API. It listens on port 6379, accepts one connection, reverses the received string, sends it back to the client, and terminates gracefully.
