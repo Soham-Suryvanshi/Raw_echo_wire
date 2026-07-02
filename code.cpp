@@ -32,6 +32,16 @@ int main(){
     exit(EXIT_FAILURE);
    }
    std::cout<<"listening on port 6379..."<<std::endl;
-   std::cin.get();
+   sockaddr_in client_address{};
+   socklen_t client_len = sizeof(client_address);
+
+   int client_fd = accept(server_fd,(struct sockaddr*)&client_address,&client_len);
+   if(client_fd<0){
+    perror("accept failed");
+    exit(EXIT_FAILURE);
+   }
+   std::cout<<"accepted client,fd="<<client_fd<<std::endl;
+   close(client_fd);
+   close(server_fd);
    return 0;
 }
